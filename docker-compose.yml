@@ -1,0 +1,32 @@
+version: "3"
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=spring-zoo
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    restart: unless-stopped
+    networks:
+      - mynet
+  # APP*****************************************
+  springbootapp:
+    image: zoo-spring:0.0.1-SNAPSHOT
+    container_name: zoo-spring
+    ports:
+      - 8080:8080
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    networks:
+      - mynet
+volumes:
+  postgres-data:
+
+networks:
+  mynet:
+    driver: bridge
