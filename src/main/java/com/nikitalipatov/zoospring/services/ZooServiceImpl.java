@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static com.nikitalipatov.zoospring.constants.Constants.*;
 
@@ -76,7 +75,7 @@ public class ZooServiceImpl implements ZooService {
     public List<Animal> getType(List<Zoo> zoo, String value) {
         List<Animal> animals = new ArrayList<>();
         for (Zoo item : zoo) {
-            if (item.getAnimal().getLegs() == Integer.parseInt(value)) {
+            if (item.getAnimal().getType().equals(value)) {
                 animals.add(item.getAnimal());
             }
         }
@@ -86,7 +85,7 @@ public class ZooServiceImpl implements ZooService {
     public List<Animal> getColor(List<Zoo> zoo, String value) {
         List<Animal> animals = new ArrayList<>();
         for (Zoo item : zoo) {
-            if (item.getAnimal().getLegs() == Integer.parseInt(value)) {
+            if (item.getAnimal().getColor().equals(value)) {
                 animals.add(item.getAnimal());
             }
         }
@@ -96,7 +95,7 @@ public class ZooServiceImpl implements ZooService {
     public List<Animal> getArea(List<Zoo> zoo, String value) {
         List<Animal> animals = new ArrayList<>();
         for (Zoo item : zoo) {
-            if (item.getAnimal().getLegs() == Integer.parseInt(value)) {
+            if (item.getAnimal().getArea().equals(value)) {
                 animals.add(item.getAnimal());
             }
         }
@@ -104,25 +103,19 @@ public class ZooServiceImpl implements ZooService {
     }
 
     @Override
-    public Boolean deleteAnimal(String name) {
-        boolean result = false;
+    public void deleteAnimal(String name) {
         List<Zoo> zoo = zooRepository.findAll();
         for (Zoo value : zoo) {
             if (value.getAnimal().getName().equals(name)) {
                 zooRepository.deleteById(value.getId());
-                result = true;
             }
         }
-       if (result) {
-           return result;
-       } else throw new NullPointerException("No such animal " + name);
     }
 
     @Override
     public Zoo addAnimal(String animal, String name, int legs,
-                         String type, String color, String area)
-    {
-        var result = switch (animal)  {
+                         String type, String color, String area) {
+        var result = switch (animal) {
             case BEAR -> animalFactory.createBear(name, legs, type, color, area);
             case WOLF -> animalFactory.createWolf(name, legs, type, color, area);
             case TIGER -> animalFactory.createTiger(name, legs, type, color, area);
@@ -139,11 +132,10 @@ public class ZooServiceImpl implements ZooService {
         for (Zoo value : zoo) {
             if (value.getAnimal().getName().equals(name)) {
                 value.getAnimal().setName(newName);
-                entity = value;
+                entity = zooRepository.save(value);
             }
         }
         if (entity != null) {
-            zooRepository.save(entity);
             return entity.getAnimal();
         } else throw new NullPointerException("No such animal " + name);
     }
